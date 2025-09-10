@@ -1,16 +1,36 @@
-import { Button, Form } from "antd"
+import { Button, Form, message } from "antd"
 import WelcomeContent from "../common/welcome-content.tsx"
 import Input from "antd/es/input/Input"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import axios from "axios"
+import { useState } from "react"
 
+interface RegisterForm {
+  name: string
+  email: string
+  password: string
+}
 function RegisterPage() {
-
-  const onSubmit = (values: any) => {
-    console.log(values)
+  const navigate = useNavigate()
+  const [loading, setLoading] = useState(false)
+  const onSubmit = async (values: RegisterForm) => {
+    try {
+      setLoading(true)
+      const response = await axios.post("/api/users/register", values);
+      console.log(response.data)
+      message.success(response.data.message)
+      if (response.data.message === "User created successfully") {
+        navigate("/login");
+      }         
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setLoading(false)
+    } 
   }
 
   const onFinishFailed = (errorInfo: any) => {
-    console.log(errorInfo)
+    console.log(errorInfo.errorFields || [])
   }
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 h-screen">
@@ -42,7 +62,7 @@ function RegisterPage() {
                 rules={[{ required: true, message: "Please enter your password" }]}>
                   <Input placeholder="Enter your password" />
                 </Form.Item>
-                <Button type="primary" htmlType="submit">Register</Button>
+                <Button type="primary" htmlType="submit" loading={loading}>Register</Button>
                 <span className="text-sm text-gray-500">Already have an account? <Link to="/login">Login</Link></span>
               </Form>
             </div>
