@@ -22,8 +22,8 @@ function RegisterPage() {
       if (response.data.message === "User created successfully") {
         navigate("/login");
       }         
-    } catch (error) {
-      console.log(error)
+    } catch (error: any) {
+      message.error(error?.response?.data?.message || "Registration failed")
     } finally {
       setLoading(false)
     } 

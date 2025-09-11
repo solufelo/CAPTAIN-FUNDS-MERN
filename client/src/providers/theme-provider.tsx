@@ -1,5 +1,5 @@
 import React from "react";
-import { ConfigProvider } from "antd";
+import { ConfigProvider, App } from "antd";
 
 function ThemeProvider({ children }: { children: React.ReactNode }) {
   return <ConfigProvider
@@ -20,7 +20,11 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
       },
     },
   }}
-  >{children}</ConfigProvider>;
+  >
+    <App>
+      {children}
+    </App>
+  </ConfigProvider>;
 }
 
 export default ThemeProvider;

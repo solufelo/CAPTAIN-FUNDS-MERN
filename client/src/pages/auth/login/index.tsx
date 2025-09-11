@@ -3,6 +3,7 @@ import WelcomeContent from "../common/welcome-content"
 import { Link, useNavigate } from "react-router-dom"
 import axios from "axios"
 import { useState } from "react"
+import userStore from "../../../store/users-store"
 
 interface LoginForm {
   email: string
@@ -12,14 +13,21 @@ interface LoginForm {
 function LoginPage() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
+  const { setCurrentUser } = userStore()
 
   const onSubmit = async (values: LoginForm) => {
     try {
       setLoading(true)
       const response = await axios.post("/api/users/login", values)
       message.success(response.data.message || "Login successful")
-      if (response.data.token) {
+      if (response.data.token && response.data.user) {
         localStorage.setItem("token", response.data.token)
+        localStorage.setItem("user", JSON.stringify(response.data.user))
+        // Also set cookies for consistency
+        document.cookie = `token=${response.data.token}; path=/; max-age=3600`
+        document.cookie = `user=${JSON.stringify(response.data.user)}; path=/; max-age=3600`
+        // Update store
+        setCurrentUser(response.data.user)
       }
       navigate("/")
     } catch (err: any) {
